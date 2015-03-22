@@ -4,22 +4,26 @@
 Accounts.registerLoginHandler(function(loginRequest) {
   if (!loginRequest.username)
     return undefined;
-
   var result = validateUser(loginRequest.username, loginRequest.password);
-  if (result.success) {
+  if (!result.error) {
     var userId = null;
-    var user = Meteor.users.findOne({username: result.username});
+    var user = Meteor.users.findOne({username: result.username.toLowerCase()});
     if (!user) {
-      userId = Meteor.users.insert({username: result.username});
+      userId = Meteor.users.insert({
+        username: result.username,
+        email: result.email.toLowerCase(),
+        fullname: result.fullname,
+        grade: result.description
+      });
     } else {
       userId = user._id;
     }
     var stampedToken = Accounts._generateStampedLoginToken();
     var hashStampedToken = Accounts._hashStampedToken(stampedToken);
     Meteor.users.update(userId, {$push: {'services.resume.loginTokens': hashStampedToken}});
-    return {id: userId, token: stampedToken.token};
+    return {userId: userId, token: stampedToken.token};
   } else {
-    return null;
+    return {error: new Meteor.Error(403, 'Incorrect password')};
   }
 });
 
@@ -27,13 +31,16 @@ function validateUser(username, password) {
   username = username.split('@')[0]; // if someone uses their email, we only want the username.
   var r;
   try {
+    var token = HTTP.post("https://sandbox.dalton.org/webapps/auth/index.php/token", {
+      params: {username:'temp', password:'temp'}
+    }).data.token;
     r = HTTP.call("POST", "https://sandbox.dalton.org/webapps/auth/index.php/login", {
-      data: {
-        token: '422e92bbaeb54f14a6bf971abe8a0a57',
+      params: {
+        token: token,
         username: username,
         password: password
       }
-    });
+    }).data;
   } catch(e) {
     r = {};
   }
