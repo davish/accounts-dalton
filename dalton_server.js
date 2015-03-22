@@ -10,7 +10,7 @@ Accounts.registerLoginHandler(function(loginRequest) {
     var user = Meteor.users.findOne({username: result.username.toLowerCase()});
     if (!user) {
       userId = Meteor.users.insert({
-        username: result.username,
+        username: result.username.toLowerCase(),
         email: result.email.toLowerCase(),
         fullname: result.fullname,
         grade: result.description
