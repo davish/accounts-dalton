@@ -12,9 +12,11 @@ Package.describe({
 
 Package.onUse(function(api) {
   api.versionsFrom('1.0.4');
-  api.addFiles('accounts-dalton.js');
 
   api.use('accounts-base');
+
+  api.addFiles('dalton_client.js', 'client');
+  api.addFiles('dalton_server.js', 'server');
 
 });
 
