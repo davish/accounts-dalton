@@ -7,5 +7,5 @@ Meteor.loginWithDalton = function(username, password, callback) {
   Accounts.callLoginMethod({
     methodArguments: [loginRequest],
     userCallback: callback
-  })
+  });
 };
