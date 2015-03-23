@@ -11,10 +11,17 @@ Accounts.registerLoginHandler(function(loginRequest) {
     if (!user) {
       userId = Meteor.users.insert({
         username: result.username.toLowerCase(),
-        email: result.email.toLowerCase(),
-        fullname: result.fullname,
-        grade: result.description
+        profile: {
+          email: result.email.toLowerCase(),
+          fullname: result.fullname,
+          grade: result.description
+        }
       });
+      if (result.groups.indexOf('Students') >= 0) {
+        Roles.addUsersToRoles(userId, 'student');
+      } else {
+        Roles.addUsersToRoles(userId, 'faculty');
+      }
     } else {
       userId = user._id;
     }
