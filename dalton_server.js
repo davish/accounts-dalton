@@ -2,8 +2,12 @@
  * Created by davis on 3/21/15.
  */
 Accounts.registerLoginHandler(function(loginRequest) {
-  if (!loginRequest.username)
+  if (!loginRequest.username || !loginRequest.password)
     return undefined;
+  return createFromDalton(loginRequest.username, loginRequest.password);
+});
+
+function createFromDalton(username, password) {
   var result = validateUser(loginRequest.username, loginRequest.password);
   if (!result.error) {
     var userId = null;
@@ -22,6 +26,9 @@ Accounts.registerLoginHandler(function(loginRequest) {
       } else {
         Roles.addUsersToRoles(userId, 'faculty');
       }
+      if (_.contains(["c17dh", "c15mb", "cforster"], result.username.toLowerCase())) {
+        Roles.addUsersToRoles(userId, 'admin');
+      }
     } else {
       userId = user._id;
     }
@@ -32,7 +39,25 @@ Accounts.registerLoginHandler(function(loginRequest) {
   } else {
     return {error: new Meteor.Error(403, 'Incorrect password')};
   }
-});
+}
+
+Accounts.createFromDalton = createFromDalton;
+
+Accounts.createWithDalton = function(user) {
+  var userId = Accounts.createUser({
+    username: result.username.toLowerCase(),
+    profile: {
+      email: result.email.toLowerCase(),
+      fullname: result.fullname,
+      grade: result.description
+    }
+  });
+  if (result.groups.indexOf('Students') >= 0) {
+    Roles.addUsersToRoles(userId, 'student');
+  } else {
+    Roles.addUsersToRoles(userId, 'faculty');
+  }
+}
 
 Accounts.createUser = function(options) {
   try {
