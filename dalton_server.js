@@ -8,7 +8,7 @@ Accounts.registerLoginHandler(function(loginRequest) {
 });
 
 function createFromDalton(username, password) {
-  var result = validateUser(loginRequest.username, loginRequest.password);
+  var result = validateUser(username, password);
   if (!result.error) {
     var userId = null;
     var user = Meteor.users.findOne({username: result.username.toLowerCase()});
@@ -57,7 +57,7 @@ Accounts.createWithDalton = function(user) {
   } else {
     Roles.addUsersToRoles(userId, 'faculty');
   }
-}
+};
 
 Accounts.createUser = function(options) {
   try {
@@ -81,7 +81,7 @@ Accounts.createUser = function(options) {
       grade: options.profile.grade
     }
   });
-}
+};
 
 function validateUser(username, password) {
   username = username.split('@')[0]; // if someone uses their email, we only want the username.
@@ -101,5 +101,4 @@ function validateUser(username, password) {
     r = {};
   }
   return r;
-
-}
+};
