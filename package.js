@@ -15,6 +15,7 @@ Package.onUse(function(api) {
 
   api.use('accounts-base');
   api.use('alanning:roles');
+  api.use('check');
 
   api.addFiles('dalton_client.js', 'client');
   api.addFiles('dalton_server.js', 'server');

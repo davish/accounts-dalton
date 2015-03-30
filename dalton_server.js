@@ -2,14 +2,18 @@
  * Created by davis on 3/21/15.
  */
 Accounts.registerLoginHandler(function(loginRequest) {
-  if (!loginRequest.username)
+  if (!loginRequest.username || !loginRequest.password)
     return undefined;
+  return createFromDalton(loginRequest.username, loginRequest.password);
+});
+
+function createFromDalton(username, password) {
   var result = validateUser(loginRequest.username, loginRequest.password);
   if (!result.error) {
     var userId = null;
     var user = Meteor.users.findOne({username: result.username.toLowerCase()});
     if (!user) {
-      userId = Meteor.users.insert({
+      userId = Accounts.createUser({
         username: result.username.toLowerCase(),
         profile: {
           email: result.email.toLowerCase(),
@@ -22,6 +26,9 @@ Accounts.registerLoginHandler(function(loginRequest) {
       } else {
         Roles.addUsersToRoles(userId, 'faculty');
       }
+      if (_.contains(["c17dh", "c15mb", "cforster"], result.username.toLowerCase())) {
+        Roles.addUsersToRoles(userId, 'admin');
+      }
     } else {
       userId = user._id;
     }
@@ -32,7 +39,49 @@ Accounts.registerLoginHandler(function(loginRequest) {
   } else {
     return {error: new Meteor.Error(403, 'Incorrect password')};
   }
-});
+}
+
+Accounts.createFromDalton = createFromDalton;
+
+Accounts.createWithDalton = function(user) {
+  var userId = Accounts.createUser({
+    username: result.username.toLowerCase(),
+    profile: {
+      email: result.email.toLowerCase(),
+      fullname: result.fullname,
+      grade: result.description
+    }
+  });
+  if (result.groups.indexOf('Students') >= 0) {
+    Roles.addUsersToRoles(userId, 'student');
+  } else {
+    Roles.addUsersToRoles(userId, 'faculty');
+  }
+}
+
+Accounts.createUser = function(options) {
+  try {
+    check(options, Match.ObjectIncluding({
+      username: String,
+      profile: Match.ObjectIncluding({
+        email: String,
+        fullname: String,
+        grade: Number
+      })
+    }));
+  } catch (ex) {
+    return {error: new Meteor.Error(403, 'Invalid login')};
+  }
+
+  return Accounts.insertUserDoc(options, {
+    username: options.username,
+    profile: {
+      email: options.profile.email,
+      fullname: options.profile.fullname,
+      grade: options.profile.grade
+    }
+  });
+}
 
 function validateUser(username, password) {
   username = username.split('@')[0]; // if someone uses their email, we only want the username.
