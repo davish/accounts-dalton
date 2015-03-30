@@ -8,7 +8,7 @@ Accounts.registerLoginHandler(function(loginRequest) {
 });
 
 function createFromDalton(username, password) {
-  var result = validateUser(loginRequest.username, loginRequest.password);
+  var result = validateUser(username, password);
   if (!result.error) {
     var userId = null;
     var user = Meteor.users.findOne({username: result.username.toLowerCase()});
