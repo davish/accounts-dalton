@@ -9,7 +9,7 @@ Accounts.registerLoginHandler(function(loginRequest) {
     var userId = null;
     var user = Meteor.users.findOne({username: result.username.toLowerCase()});
     if (!user) {
-      userId = Meteor.users.insert({
+      userId = Accounts.createUser({
         username: result.username.toLowerCase(),
         profile: {
           email: result.email.toLowerCase(),
@@ -33,6 +33,30 @@ Accounts.registerLoginHandler(function(loginRequest) {
     return {error: new Meteor.Error(403, 'Incorrect password')};
   }
 });
+
+Accounts.createUser = function(options) {
+  try {
+    check(options, Match.ObjectIncluding({
+      username: String,
+      profile: Match.ObjectIncluding({
+        email: String,
+        fullname: String,
+        grade: Number
+      })
+    }));
+  } catch (ex) {
+    return {error: new Meteor.Error(403, 'Invalid login')};
+  }
+
+  return Accounts.insertUserDoc(options, {
+    username: options.username,
+    profile: {
+      email: options.profile.email,
+      fullname: options.profile.fullname,
+      grade: options.profile.grade
+    }
+  });
+}
 
 function validateUser(username, password) {
   username = username.split('@')[0]; // if someone uses their email, we only want the username.
