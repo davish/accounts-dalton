@@ -18,7 +18,7 @@ function createFromDalton(username, password) {
         profile: {
           email: result.email.toLowerCase(),
           fullname: result.fullname,
-          grade: result.description
+          grade: parseInt(result.description)
         }
       });
       if (result.groups.indexOf('Students') >= 0) {
