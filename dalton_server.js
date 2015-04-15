@@ -65,7 +65,7 @@ Accounts.createUser = function(options) {
       grade: options.profile.grade
     }
   });
-}
+};
 
 function validateUser(username, password) {
   username = username.split('@')[0]; // if someone uses their email, we only want the username.
@@ -85,5 +85,4 @@ function validateUser(username, password) {
     r = {};
   }
   return r;
-
-}
+};
