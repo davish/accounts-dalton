@@ -18,7 +18,7 @@ function createFromDalton(username, password) {
         profile: {
           email: result.email.toLowerCase(),
           fullname: result.fullname,
-          grade: result.description
+          grade: parseInt(result.description)
         }
       });
       if (result.groups.indexOf('Students') >= 0) {
@@ -42,22 +42,6 @@ function createFromDalton(username, password) {
 }
 
 Accounts.createFromDalton = createFromDalton;
-
-Accounts.createWithDalton = function(user) {
-  var userId = Accounts.createUser({
-    username: result.username.toLowerCase(),
-    profile: {
-      email: result.email.toLowerCase(),
-      fullname: result.fullname,
-      grade: result.description
-    }
-  });
-  if (result.groups.indexOf('Students') >= 0) {
-    Roles.addUsersToRoles(userId, 'student');
-  } else {
-    Roles.addUsersToRoles(userId, 'faculty');
-  }
-};
 
 Accounts.createUser = function(options) {
   try {
