@@ -71,18 +71,31 @@ function validateUser(username, password) {
   username = username.split('@')[0]; // if someone uses their email, we only want the username.
   var r;
   try {
-    var token = HTTP.post("https://sandbox.dalton.org/webapps/auth/index.php/token", {
-      params: {username:'temp', password:'temp'}
-    }).data.token;
-    r = HTTP.call("POST", "https://sandbox.dalton.org/webapps/auth/index.php/login", {
-      params: {
-        token: token,
-        username: username,
-        password: password
-      }
-    }).data;
+    var res = HTTP.call('GET', 'http://compsci.dalton.org:8080/zbuttenwieser/validation/index.jsp?username='+username+'&password='+password);
+    r = {
+      username: username,
+      fullname: username,
+      description: 11,
+      email: username + '@dalton.org',
+      groups: ['Students']
+    }
   } catch(e) {
-    r = {};
+    r = {error: e};
   }
+
+  //try {
+  //  var token = HTTP.post("https://sandbox.dalton.org/webapps/auth/index.php/token", {
+  //    params: {username:'temp', password:'temp'}
+  //  }).data.token;
+  //  r = HTTP.call("POST", "https://sandbox.dalton.org/webapps/auth/index.php/login", {
+  //    params: {
+  //      token: token,
+  //      username: username,
+  //      password: password
+  //    }
+  //  }).data;
+  //} catch(e) {
+  //  r = {};
+  //}
   return r;
 };
